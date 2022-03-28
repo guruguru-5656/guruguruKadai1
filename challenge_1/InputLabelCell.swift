@@ -10,14 +10,17 @@ import UIKit
 
 class InputLabelCell: UITableViewCell, UITextFieldDelegate {
     static let cellHeight = 45
-    weak var delegate: InputLabelCellDelegate?
-    var index = 0
-    @IBAction private func updateTextWhenEditingChanged(_ sender: UITextField) {
-        print(0)
-        delegate?.updateText(text: sender.text, index: index)
-    }
-}
 
-protocol InputLabelCellDelegate: AnyObject {
-    func updateText(text: String?, index: Int)
+    private var didUpdateText: (String) -> Void = { _ in }
+
+    @IBOutlet private weak var textField: UITextField!
+
+    @IBAction private func updateTextWhenEditingChanged(_ sender: UITextField) {
+        didUpdateText(sender.text ?? "")
+    }
+
+    func configure(text: String, didUpdateText: @escaping (String) -> Void) {
+        self.textField.text = text
+        self.didUpdateText = didUpdateText
+    }
 }

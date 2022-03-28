@@ -8,47 +8,48 @@
 import UIKit
 
 class ViewController: UIViewController, UITableViewDelegate {
-    let numberOfInput = 5
-    var inputNumbers: [Int] = []
+    private var inputTextList: [String] = Array(repeating: "", count: 50)
+
     @IBOutlet private weak var inputTextTableView: UITableView!
     @IBOutlet private weak var inputTextTableViewHeight: NSLayoutConstraint!
     @IBOutlet private weak var resultLabel: UILabel!
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        inputNumbers = Array(repeating: 0, count: numberOfInput)
         inputTextTableView.dataSource = self
     }
+
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
             inputTextTableViewHeight.constant =
-        CGFloat(numberOfInput * InputLabelCell.cellHeight)
+        CGFloat(inputTextList.count * InputLabelCell.cellHeight)
     }
+
     @IBAction private func calculateSum(_ sender: Any) {
-        let resultNumber = inputNumbers
-            .reduce(0) { $0 + $1 }
+        let resultNumber = inputTextList
+            .compactMap { Int($0) }
+            .reduce(0, +)
         resultLabel.text = String(resultNumber)
     }
 }
 
 extension ViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        numberOfInput
+        inputTextList.count
     }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "InputLabelCell", for: indexPath)
                 as? InputLabelCell else {
             return UITableViewCell()
         }
-        cell.index = indexPath.row
-        cell.delegate = self
-        return cell
-    }
-}
 
-extension ViewController: InputLabelCellDelegate {
-    func updateText(text: String?, index: Int) {
-        let number = Int(text ?? "0") ?? 0
-        print(number)
-        inputNumbers[index] = number
+        cell.configure(
+            text: inputTextList[indexPath.row],
+            didUpdateText: { [weak self] in
+                self?.inputTextList[indexPath.row] = $0
+            }
+        )
+
+        return cell
     }
 }

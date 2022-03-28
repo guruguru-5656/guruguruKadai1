@@ -41,6 +41,9 @@
                                                 </textField>
                                             </subviews>
                                         </tableViewCellContentView>
+                                        <connections>
+                                            <outlet property="textField" destination="Ht4-fb-cxh" id="IFV-sE-0NB"/>
+                                        </connections>
                                     </tableViewCell>
                                 </prototypes>
                             </tableView>
